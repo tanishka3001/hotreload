@@ -1,1 +1,1 @@
-go run ./testserver
+.\bin\server.exe

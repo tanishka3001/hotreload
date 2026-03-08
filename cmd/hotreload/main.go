@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"time"
 	"log/slog"
 	"os"
@@ -50,14 +49,18 @@ func main() {
 		logger.Info("File change detected. Rebuilding...")
 
 		server.Stop()
-
 		err := builder.Build(*build)
 
-		if err != nil {
-			logger.Error("Build failed. Waiting for next change...", "error", err)
-			continue
-		}
+if err != nil {
+    logger.Error("Build failed", "error", err)
+    continue
+}
 
-		server.Start(*run)
+time.Sleep(1 * time.Second)
+
+logger.Info("Restarting server")
+
+server.Start(*run)
+
 	}
 }
