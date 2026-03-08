@@ -39,7 +39,8 @@ func (s *Server) Stop() {
 	}
 
 	fmt.Println("Stopping server")
-	
+
+	exec.Command("taskkill", "/T", "/F", "/PID", fmt.Sprint(s.Cmd.Process.Pid)).Run()
 
 	s.Cmd = nil
 }
