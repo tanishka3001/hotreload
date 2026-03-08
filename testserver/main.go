@@ -8,7 +8,7 @@ import (
 func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Server starting...")
+		fmt.Fprintln(w, "Server UPDATED...")
 	})
 
 	fmt.Println("Server started on http://localhost:8080")

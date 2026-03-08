@@ -1,5 +1,4 @@
 package main
-
-func helper() string {
+func helper() string{
 	return "helper"
 }

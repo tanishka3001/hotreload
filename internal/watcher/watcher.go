@@ -66,14 +66,35 @@ if err != nil {
 		for {
 			select {
 
+			
 			case event := <-watcher.Events:
-				if shouldIgnore(event.Name) {
-	              return
-}
 
-fmt.Println("File change detected:", event.Name)
-changes <- struct{}{}
+	if shouldIgnore(event.Name) {
+		continue
+	}
 
+	if event.Op&fsnotify.Remove == fsnotify.Remove {
+		fmt.Println("Directory or file removed:", event.Name)
+		continue
+	}
+
+	if event.Op&fsnotify.Create == fsnotify.Create {
+
+		info, err := os.Stat(event.Name)
+		if err == nil && info.IsDir() {
+			fmt.Println("New directory detected:", event.Name)
+			addRecursiveWatch(watcher, event.Name)
+			continue
+		}
+	}
+
+	if event.Op&fsnotify.Write == fsnotify.Write ||
+		event.Op&fsnotify.Create == fsnotify.Create {
+
+		fmt.Println("File change detected:", event.Name)
+
+		changes <- struct{}{}
+	}
 			case err := <-watcher.Errors:
 				fmt.Println("Watcher error:", err)
 			}
