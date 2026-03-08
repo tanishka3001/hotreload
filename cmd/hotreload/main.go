@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"time"
+	"log/slog"
+	"os"
 
 	"hotreload/internal/builder"
 	"hotreload/internal/debounce"
@@ -12,7 +14,7 @@ import (
 )
 
 func main() {
-
+    logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	root := flag.String("root", ".", "root directory to watch")
 	build := flag.String("build", "", "build command")
 	run := flag.String("exec", "", "run command")
@@ -27,32 +29,32 @@ func main() {
 
 	err := watcher.Watch(*root, changes)
 	if err != nil {
-		fmt.Println("Watcher error:", err)
+		logger.Error("Watcher error:", "error", err)
 		return
 	}
 
-	fmt.Println("Starting hotreload...")
+	logger.Info("Starting hotreload...")
 
-	fmt.Println("Running initial build")
+	logger.Info("Running initial build")
 
 	err = builder.Build(*build)
 
 	if err != nil {
-		fmt.Println("Initial build failed")
+		logger.Error("Initial build failed", "error", err)
 	} else {
 		server.Start(*run)
 	}
 
 	for range debounced {
 
-		fmt.Println("File change detected. Rebuilding...")
+		logger.Info("File change detected. Rebuilding...")
 
 		server.Stop()
 
 		err := builder.Build(*build)
 
 		if err != nil {
-			fmt.Println("Build failed. Waiting for next change...")
+			logger.Error("Build failed. Waiting for next change...", "error", err)
 			continue
 		}
 
